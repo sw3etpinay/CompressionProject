@@ -20,11 +20,15 @@ public class Huffman
     public static final byte CHARBITS = 7;
     public static final short CHARBITMAX = 128;
     //private HuffmanTree<Character> theTree;
+    private HuffmanChar charCount;
+    private HuffmanData data;
     private byte[] byteArray;
     private String file;
     private Map mapCharCount;
     private Map sortedMap;
-    HuffmanChar[] charCountArray;
+    private SortedMap<Character, String> keyMap;
+    private SortedMap<String, Character> codeMap;
+    protected ArrayList<HuffmanChar> charCountArray;
     char[] readChar; 
     byte[] saveDataArray;
     
@@ -37,6 +41,7 @@ public class Huffman
         byteArray = new byte[CHARBITMAX];
         mapCharCount = new HashMap<>();
         sortedMap = new LinkedHashMap<>();
+        charCountArray = new ArrayList<HuffmanChar>();
     }
     
     /**
@@ -97,7 +102,8 @@ public class Huffman
                     char c = readChar[i];
                     countChars((byte)c);
                 }
-            }   
+            }
+            readChar = null;
         }
         catch(FileNotFoundException e)
         {
@@ -108,7 +114,8 @@ public class Huffman
             
         }
         addCharAndCount();
-//        theTree = new HuffmanTree(sortedMap);
+        addHuffArray(sortedMap);
+//        theTree = new HuffmanTree(charCountArray);
         writeEncodedFile(byteArray, fileName);
         writeKeyFile(fileName);
     } 
@@ -154,6 +161,7 @@ public class Huffman
     public void writeEncodedFile(byte[] bytes, String fileName)
             
     {
+        //write first file(array byte)
         writeKeyFile(fileName);
         try
         {
@@ -169,6 +177,8 @@ public class Huffman
         {
             e.printStackTrace();
         }
+        //write second file
+        writeSecondFile(fileName);
     }
    
     /**
@@ -193,6 +203,29 @@ public class Huffman
         int extensionIndex = editFileName.lastIndexOf(".");
         file = editFileName.substring(0, extensionIndex);
         file += ".huf";
+    }
+    /**
+     * writeSecondFile
+     * @param fileName the name of the file to write to
+     */
+    public void writeSecondFile(String fileName)
+    {
+        String separate = File.separator;
+        String editFileName;
+        // Remove the path upto the filename.
+        int lastSeparatorIndex = fileName.lastIndexOf(separate);
+        if (lastSeparatorIndex == -1) 
+        {
+            editFileName = fileName;
+        } 
+        else 
+        {
+            editFileName = fileName.substring(lastSeparatorIndex + 1);
+        }
+        // Remove the extension.
+        int extensionIndex = editFileName.lastIndexOf(".");
+        file = editFileName.substring(0, extensionIndex);
+        file += ".cod";
     }
     /**
      * count the number characters
@@ -225,7 +258,9 @@ public class Huffman
                 mapCharCount.put(key,count);
             }
         }
+        byteArray = null;
         sortedMap.putAll(sortMap(mapCharCount));
+        mapCharCount.clear();
     }
     /**
      * Sorts the Map from lowest to highest and returns the sorted map.
@@ -256,10 +291,27 @@ public class Huffman
             }
         }); 
         //add sorted list to new map
-        for (Map.Entry<Character, Integer> entry : sortedList)
+        for(Map.Entry<Character, Integer> entry : sortedList)
         {
             sortedMap.put(entry.getKey(), entry.getValue());
         } 
         return sortedMap;
     }  
+    /**
+     * adds the map keys and values to the arrayList
+     * @param map the sorted map
+     */
+    private void addHuffArray(Map map)
+    {
+        Iterator iterateKey = map.keySet().iterator();
+        Iterator iterateValues = map.values().iterator();
+        while(iterateKey.hasNext() && iterateValues.hasNext())
+        {
+            char key = (char) iterateKey.next();
+            int value = (int) iterateValues.next();
+            charCount = new HuffmanChar(key, value);
+            charCountArray.add(charCount);
+        }
+        map.clear();       
+    }
 }
