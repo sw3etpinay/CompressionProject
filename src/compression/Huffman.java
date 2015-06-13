@@ -25,6 +25,7 @@ public class Huffman
     private HuffmanChar charCount;
     private HuffmanData data;
     private byte[] byteArray;
+    private String[] codeArray;
     private String file;
     private Map mapCharCount;
     private Map sortedMap;
@@ -32,10 +33,12 @@ public class Huffman
     private SortedMap<String, Character> codeMap;
     protected ArrayList<HuffmanChar> charCountArray;
     TreeSet <HuffTree> huffTree = new TreeSet<HuffTree>();
-      StringBuffer code = new StringBuffer();
-  Hashtable <Character,String>huffEncodeTable = new Hashtable <Character,String>();
- 
-  
+    StringBuffer code = new StringBuffer();
+    Hashtable <Character,String>huffEncodeTable = new 
+        Hashtable <Character,String>();
+    ArrayList<String> values = new ArrayList();
+    ArrayList<Byte> dataEncoded =  new ArrayList();
+    String dataCode = "";
     char[] readChar; 
     byte[] saveDataArray;
     
@@ -46,12 +49,12 @@ public class Huffman
     public Huffman() 
     {
   
+        codeArray = new String[1000];
         byteArray = new byte[CHARBITMAX];
         mapCharCount = new HashMap<>();
         sortedMap = new LinkedHashMap<>();
         charCountArray = new ArrayList<HuffmanChar>();
-    }
-    
+    }   
     /**
      * main
      * @param args the command line arguments
@@ -61,8 +64,8 @@ public class Huffman
 //----------------------------------------------------
 // used for debugging encoding
 //----------------------------------------------------
-        args = new String[1];
-        args[0] = "src/compression/11.txt";
+//        args = new String[1];
+//        args[0] = "src/compression/11.txt";
 //----------------------------------------------------
 // used for debugging encoding
 //----------------------------------------------------
@@ -104,11 +107,19 @@ public class Huffman
             while((text = readMe.readLine()) != null)
             {
                 String sentence = text + "\n";
-                readChar = sentence.toCharArray();
-                for(int i = 0; i < readChar.length; i++)
+                for(int cnt = 0;cnt < sentence.length();cnt++)
                 {
-                    char c = readChar[i];
-                    countChars((byte)c);
+                    char key = sentence.charAt(cnt);
+                    if(mapCharCount.containsKey(key))
+                    {
+                        int value = (int) mapCharCount.get(key);
+                        value += 1;
+                        mapCharCount.put(key,value);
+                    }
+                    else
+                    {
+                        mapCharCount.put(key,1);
+                    }
                 }
             }
             readChar = null;
@@ -123,12 +134,10 @@ public class Huffman
         }
         addCharAndCount();
         addHuffArray(sortedMap);
-//        theTree = new HuffmanTree(charCountArray);
- 
         readTree();
         createCode(huffTree.first());
-        String val = readSetFile(fileName);
-        writeEncodedFile(val, fileName);
+        values = readSetFile(fileName);
+        writeEncodedFile(values, fileName);
         writeKeyFile(fileName);
     } 
  
@@ -137,79 +146,49 @@ public class Huffman
      * @param inFileName the file to decode
      */   
     public void decode(String inFileName)
-    {      String text ="";
+    { 
+        String text = "";
         try
         {
-            File file = new File(inFileName);
-            Path path = Paths.get(file.getAbsolutePath()); 
-            byte[] data = Files.readAllBytes(path); 
-            
-            BufferedReader readMe = new BufferedReader(new FileReader(inFileName));
-            while ((text = readMe.readLine()) != null)
+            BufferedReader readMe = new BufferedReader
+                    (new FileReader(inFileName));
+            while((text = readMe.readLine()) != null)
             {
-                File file2 = new File(inFileName)
+                String sentence = text + "\n";
+                readChar = sentence.toCharArray();
+                for(int i = 0; i < readChar.length; i++)
                 {
-                    Path path = Paths.get(file.getAbsolutePath()); 
-                    byte[] data2 = Files.readAllBytes(path); 
+                    char c = readChar[i];
+                    countChars((byte)c);
                 }
-                        
-            }
-            
-            for (int i = 0; i < data.length; i++)
-            {
-                HuffmanTree theHuff = new HuffmanTree();
-                
-                theHuff.add();
-            }
-     //
+            }   
         }
-        catch (IOException e)
+        catch(FileNotFoundException e)
+        {
+            System.exit(0);
+        }
+        catch(IOException e)
         {
             
         }
-        
-//        String text = "";
-//        try
-//        {
-//            BufferedReader readMe = new BufferedReader
-//                    (new FileReader(inFileName));
-//            while((text = readMe.readLine()) != null)
-//            {
-//                String sentence = text + "\n";
-//                readChar = sentence.toCharArray();
-//                for(int i = 0; i < readChar.length; i++)
-//                {
-//                    char c = readChar[i];
-//                    countChars((byte)c);
-//                }
-//            }   
-//        }
-//        catch(FileNotFoundException e)
-//        {
-//            System.exit(0);
-//        }
-//        catch(IOException e)
-//        {
-//            
-//        }
     }
       
     /**
      * writeEncodedFile
-     * @param bytes bytes for file
+     * @param values
      * @param fileName file input
      */ 
-    public void writeEncodedFile(String val, String fileName)          
+    public void writeEncodedFile(ArrayList<String> values, String fileName)          
     {
-        
-        //write first file(array byte)
         writeKeyFile(fileName);
         try
         {
             PrintWriter write = new PrintWriter(new FileOutputStream(
-                        file));  
-            write.println(val);
+                        file)); 
+            for (String value : values) 
+                write.print(value);
             write.close();
+            
         }
         catch(FileNotFoundException e)
         {
@@ -217,32 +196,32 @@ public class Huffman
         }
         writeSecondFile(fileName);  
     }
-    private String readSetFile(String fileName)
+    private ArrayList readSetFile(String fileName)
     {
-        String value = "";
+        ArrayList<String> values = new ArrayList();
+        String line = "";
         try
         {
             BufferedReader buff = new BufferedReader(new FileReader(fileName));
-            while (buff.readLine() != null)
+            while((line = buff.readLine()) != null)
             {
-                String line = buff.readLine();
-                for(int cnt = 0;cnt < line.length();cnt++)
+                for(int i = 0;i < line.length();i++)
                 {
-                    char key = line.charAt(cnt);
-                    if (huffEncodeTable.keySet().contains(key))
-                    {
-                        value += huffEncodeTable.get(key);
-                    }                 
-                }               
+                    char key = line.charAt(i);
+                    if (huffEncodeTable.containsKey(key))
+                        values.add(huffEncodeTable.get(line.charAt(i)));                   
+                } 
             }
+            
         }
         catch(FileNotFoundException ex)
         {
             
-        } catch (IOException ex) {
-            Logger.getLogger(Huffman.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) 
+        {
+            ex.printStackTrace();
         }
-        return value;
+        return values;
     }
     private void readTree()
     {
@@ -337,11 +316,13 @@ public class Huffman
      */
     private void countChars(byte character)
     {
+        
         for(int i = 0; i < byteArray.length; i++)
         {
             if(i == character)
             {
-               byteArray[i] += 1; 
+               byteArray[i] ++; 
+              
                break;
             }
         }
@@ -352,19 +333,21 @@ public class Huffman
      */
     private void addCharAndCount()
     {
-        for(int i = 0; i < byteArray.length; i++)
-        {
-            byte element = byteArray[i];
-            if(element > 0)
-            {
-                char key = (char)i;
-                int count = element;
-                mapCharCount.put(key,count);
-            }
-        }
+
+//        for(int i = 0; i < byteArray.length; i++)
+//        {
+//            byte element = byteArray[i];
+//            if (element > 0)
+//            {
+//                char key = (char)i;
+//                int count = element;
+//                mapCharCount.put(key,count);
+//                le++;
+//            }
+//        }
 //        byteArray = null;
         sortedMap.putAll(sortMap(mapCharCount));
-        mapCharCount.clear();
+//        mapCharCount.clear();
     }
     /**
      * Sorts the Map from lowest to highest and returns the sorted map.
@@ -387,8 +370,7 @@ public class Huffman
                          new Comparator<Map.Entry<Character, Integer>>()
         {
             @Override
-            public int compare(
-                   final Map.Entry<Character, Integer> element1,
+            public int compare(final Map.Entry<Character, Integer> element1,
                    final Map.Entry<Character, Integer> element2)
             {
                 return element1.getValue().compareTo(element2.getValue());
@@ -418,5 +400,4 @@ public class Huffman
         }
 //        map.clear();       
     }
-    
 }
