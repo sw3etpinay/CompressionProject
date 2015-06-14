@@ -33,18 +33,38 @@ public class HuffmanTree<T extends Comparable<? super T>>
      * Creates a new instance of HuffmanTree
      * from an array of Huffman Data
      * @param dataArray n array of Huffman Data
+     * ////////////////          in progress.
      */
-    public HuffmanTree(HuffmanData<T>[] dataArray) 
+   public HuffmanTree(HuffmanData<T>[] dataArray)
     {
-        // your code here
-
-
-
-//        
-//         keyMap = new TreeMap<String, T>();
-//         codeMap = new TreeMap<T, String>();
-//         setMaps(getRootNode(), "");
-    }
+        
+//        keyMap = new TreeMap<String, T>();
+//        codeMap = new TreeMap<T, String>();
+//        setMaps(getRootNode(), "");
+        List<HuffmanData<T>> dataList = new ArrayList<HuffmanData<T>>();
+        for(HuffmanData<T> data : dataArray)
+            dataList.add(data);
+        Collections.sort(dataList);
+        Stack<HuffmanData<T>> pq = new Stack<HuffmanData<T>>();
+        
+        while(!dataList.isEmpty())
+        {
+            HuffmanData tempData1 = dataList.get(0);
+            dataList.remove(0);
+            pq.add(tempData1);
+            
+            if(!dataList.isEmpty())
+            {
+                HuffmanData tempData2= dataList.get(0);
+                dataList.remove(0);
+                pq.add(tempData2);
+                HuffmanData nodeData = new HuffmanData(null,tempData1.getOccurances() + tempData2.getOccurances());
+                dataList.add(nodeData);
+                Collections.sort(dataList);
+                // System.out.println("tree: " + dataList);
+            }
+            //System.out.println("pq: " + pq);
+        }
     
     /** 
      * creates two new HuffmanTrees and adds them to the root of this tree
