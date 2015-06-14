@@ -68,7 +68,16 @@ public class HuffmanTree<T extends Comparable<? super T>>
      private void setMaps(BinaryNodeInterface<HuffmanData<T>> node,
              String codeString)
      { 
-       
+        if(node.hasLeftChild())
+        {
+                  
+        }
+        else if (node.hasRightChild())
+        {
+                  
+        }
+        
+        //not done yet
               
      }
     
