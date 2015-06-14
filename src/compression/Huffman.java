@@ -367,21 +367,18 @@ public class Huffman
      */
     private void addCharAndCount()
     {
-
-//        for(int i = 0; i < byteArray.length; i++)
-//        {
-//            byte element = byteArray[i];
-//            if (element > 0)
-//            {
-//                char key = (char)i;
-//                int count = element;
-//                mapCharCount.put(key,count);
-//                le++;
-//            }
-//        }
-//        byteArray = null;
+        for(int i = 0; i < byteArray.length; i++)
+        {
+            byte element = byteArray[i];
+            if(element > 0)
+            {
+                char key = (char)i;
+                int count = Math.abs(element);
+                mapCharCount.put(key,count);
+            }
+        }
         sortedMap.putAll(sortMap(mapCharCount));
-//        mapCharCount.clear();
+        mapCharCount.clear();
     }
     /**
      * Sorts the Map from lowest to highest and returns the sorted map.
