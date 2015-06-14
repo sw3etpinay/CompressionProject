@@ -70,12 +70,14 @@ public class HuffmanTree<T extends Comparable<? super T>>
      { 
         if(node.hasLeftChild())
         {
-                  
+            setMaps(node.getLeftChild(), codeString + "0");
         }
         else if (node.hasRightChild())
         {
-                  
+            setMaps(node.getRightChild(), codeString + "1");
         }
+        else
+        
         
         //not done yet
               
