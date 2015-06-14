@@ -26,21 +26,24 @@ public class Huffman
     private HuffmanData data;
     private byte[] byteArray;
     private String[] codeArray;
-    private String file;
+    private String hufFile;
+    private String codFile;
+    private int compression;
     private Map mapCharCount;
     private Map sortedMap;
     private SortedMap<Character, String> keyMap;
     private SortedMap<String, Character> codeMap;
-    protected ArrayList<HuffmanChar> charCountArray;
     TreeSet <HuffTree> huffTree = new TreeSet<HuffTree>();
     StringBuffer code = new StringBuffer();
     Hashtable <Character,String>huffEncodeTable = new 
         Hashtable <Character,String>();
     ArrayList<String> values = new ArrayList();
     ArrayList<Byte> dataEncoded =  new ArrayList();
+    ArrayList<HuffmanData> charCounter =  new ArrayList();
     String dataCode = "";
     char[] readChar; 
     byte[] saveDataArray;
+    HuffmanData[] charCountArray;
     
     
     /**
@@ -156,17 +159,7 @@ public class Huffman
         {   
         }
         addCharAndCount();
-        //Iterate through the map and add to array list
-        Iterator iterateKey = sortedMap.keySet().iterator();
-        Iterator iterateValues = sortedMap.values().iterator();
-        while(iterateKey.hasNext() && iterateValues.hasNext())
-        {
-            char key = (char) iterateKey.next();
-            int value = (int) iterateValues.next();
-            charCount = new HuffmanChar(key, value);
-            charCountArray.add(charCount);
-        }
-        sortedMap.clear();
+        addHuffArray(sortedMap);
         //theTree = new HuffmanTree(charCountArray);
         readTree();
         createCode(huffTree.first());
@@ -445,5 +438,24 @@ public class Huffman
             found = true;
         }
         return found;
+    }
+        /**
+     * Adds the sorted contents into an HuffmanData array
+     * @param map the sorted map
+     */
+    private void addHuffArray(Map map)
+    {
+        Iterator iterateKey = map.keySet().iterator();
+        Iterator iterateValues = map.values().iterator();
+        while(iterateKey.hasNext() && iterateValues.hasNext())
+        {
+            char key = (char) iterateKey.next();
+            int value = (int) iterateValues.next();
+            charCount = new HuffmanChar(key, value);
+            charCounter.add(charCount);
+        }
+        charCountArray = new HuffmanData[charCounter.size()];
+        charCountArray = charCounter.toArray(charCountArray);
+        map.clear();
     }
 }
