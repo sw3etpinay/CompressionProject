@@ -309,33 +309,13 @@ public class Huffman
         {
             editFileName = fileName.substring(lastSeparatorIndex + 1);
         }
-        // Remove the extension.
+        // Remove the extension add huf.
         int extensionIndex = editFileName.lastIndexOf(".");
-        file = editFileName.substring(0, extensionIndex);
-        file += ".huf";
-    }
-    /**
-     * writeSecondFile
-     * @param fileName the name of the file to write to
-     */
-    public void writeSecondFile(String fileName)
-    {
-        String separate = File.separator;
-        String editFileName;
-        // Remove the path upto the filename.
-        int lastSeparatorIndex = fileName.lastIndexOf(separate);
-        if (lastSeparatorIndex == -1) 
-        {
-            editFileName = fileName;
-        } 
-        else 
-        {
-            editFileName = fileName.substring(lastSeparatorIndex + 1);
-        }
-        // Remove the extension.
-        int extensionIndex = editFileName.lastIndexOf(".");
-        file = editFileName.substring(0, extensionIndex);
-        file += ".cod";
+        hufFile = editFileName.substring(0, extensionIndex);
+        hufFile += ".huf";
+        // remove the extension and add cod.
+        codFile = editFileName.substring(0, extensionIndex);
+        codFile += ".cod";
     }
     /**
      * count the number characters
