@@ -174,30 +174,52 @@ public class Huffman
      */   
     public void decode(String inFileName)
     { 
-        String text = "";
-        try
+        FileInputStream fileInputStream=null;
+ 
+        File file = new File("src/compression/11.txt");
+ 
+        byte[] byteFile = Files.readAllBytes(file.toPath());
+ 
+        try 
         {
-            BufferedReader readMe = new BufferedReader
-                    (new FileReader(inFileName));
-            while((text = readMe.readLine()) != null)
+            //Convert file into array of bytes
+	        fileInputStream = new FileInputStream(file);
+	        fileInputStream.read(byteFile);
+	        fileInputStream.close();
+ 
+	        for (int i = 0; i < byteFile.length; i++) 
             {
-                String sentence = text + "\n";
-                readChar = sentence.toCharArray();
-                for(int i = 0; i < readChar.length; i++)
-                {
-                    char c = readChar[i];
-                    countChars((byte)c);
-                }
-            }   
+	       	    countChars(bFile[i]);
+            }
         }
-        catch(FileNotFoundException e)
+        catch(Exception e)
         {
-            System.exit(0);
+            e.printStackTrace();
         }
-        catch(IOException e)
-        {
+       // String text = "";
+       //try
+       //{
+    //        BufferedReader readMe = new BufferedReader
+     //               (new FileReader(inFileName));
+     //       while((text = readMe.readLine()) != null)
+     //       {
+     //           String sentence = text + "\n";
+     //           readChar = sentence.toCharArray();
+     //           for(int i = 0; i < readChar.length; i++)
+     //           {
+     //               char c = readChar[i];
+     //               countChars((byte)c);
+     //           }
+     //       }   
+     //   }
+     //   catch(FileNotFoundException e)
+     //   {
+     //       System.exit(0);
+     //   }
+     //   catch(IOException e)
+     //   {
             
-        }
+      //  }
     }
       
     /**
