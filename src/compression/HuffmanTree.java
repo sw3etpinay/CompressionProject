@@ -6,7 +6,7 @@
 
 package compression;
 import java.util.*;
-import javafx.scene.Node;
+
 /**
  * binary tree for Huffman coding
  * @author pbladek
@@ -18,6 +18,11 @@ public class HuffmanTree<T extends Comparable<? super T>>
     private T MARKER = null;
     SortedMap<T, String> codeMap;
     SortedMap<String, T> keyMap;
+    TreeSet <HuffTree> huffTree = new TreeSet<>();
+    StringBuffer code = new StringBuffer();
+    Map <Character,Integer> frequencyData;
+    Map <Character,String> huffEncode;
+    Map <Character,Integer> sorted;
     int valueTemp = 0;
     private int leafCount = 0;
     
@@ -32,45 +37,64 @@ public class HuffmanTree<T extends Comparable<? super T>>
     /**
      * Creates a new instance of HuffmanTree
      * from an array of Huffman Data
-     * @param dataArray n array of Huffman Data
-     * ////////////////          in progress.
+     * @param sortedMap
      */
-   public HuffmanTree(HuffmanData<T>[] dataArray)
+    public HuffmanTree(Map sortedMap) 
     {
-        
-//        keyMap = new TreeMap<String, T>();
-//        codeMap = new TreeMap<T, String>();
+        frequencyData = new HashMap<>();
+        huffEncode = new HashMap<>();
+        sorted = new LinkedHashMap<>();
+        readTree(sortedMap);
+        createTree(huffTree.first());
+//        codeMap = new TreeMap<>();
 //        setMaps(getRootNode(), "");
-        List<HuffmanData<T>> dataList = new ArrayList<HuffmanData<T>>();
-        for(HuffmanData<T> data : dataArray)
-            dataList.add(data);
-        Collections.sort(dataList);
-        Stack<HuffmanData<T>> pq = new Stack<HuffmanData<T>>();
-        
-        while(!dataList.isEmpty())
+    }
+    private void readTree(Map map)
+    {
+        frequencyData.putAll(map);
+        sorted.putAll(sortMap(frequencyData));
+        Iterator <Character> iterate = (Iterator <Character>) 
+                sorted.keySet().iterator();
+        while(iterate.hasNext())
         {
-            HuffmanData tempData1 = dataList.get(0);
-            dataList.remove(0);
-            pq.add(tempData1);
-            
-            if(!dataList.isEmpty())
-            {
-                HuffmanData tempData2= dataList.get(0);
-                dataList.remove(0);
-                pq.add(tempData2);
-                HuffmanData nodeData = new HuffmanData(null,tempData1.getOccurances() + tempData2.getOccurances());
-                dataList.add(nodeData);
-                Collections.sort(dataList);
-                // System.out.println("tree: " + dataList);
-            }
-            //System.out.println("pq: " + pq);
+            Character nextKey = iterate.next();
+            huffTree.add(new HuffLeaf(nextKey,sorted.get(nextKey)));
         }
-    
+        while (huffTree.size() > 1)
+        {
+            add(huffTree);          
+        }
+    }
+    /**
+     * 
+     * @param huffTree 
+     */
+    private void createTree(HuffTree huffTree)
+    {
+        if(huffTree instanceof HuffNode)
+        {
+           HuffNode node = (HuffNode)huffTree;
+           HuffTree left = node.getLeft();
+           HuffTree right = node.getRight();
+           code.append("0");
+           createTree(left);
+           code.deleteCharAt(code.length() - 1);
+           code.append("1");
+           createTree(right);
+           code.deleteCharAt(code.length() - 1);
+        }
+        else
+        {
+            HuffLeaf leaf = (HuffLeaf)huffTree;
+            huffEncode.put((char)(leaf.getValue()),code.toString());
+        }
+        
+    }
     /** 
      * creates two new HuffmanTrees and adds them to the root of this tree
      * @param huffTree
      */
-      public void add(TreeSet <HuffTree> huffTree)
+    public void add(TreeSet <HuffTree> huffTree)
     {
         HuffTree left = huffTree.first();
         huffTree.remove(left);
@@ -124,4 +148,39 @@ public class HuffmanTree<T extends Comparable<? super T>>
     {
         return keyMap;
     }
+    /**
+     * Sorts the Map from lowest to highest and returns the sorted map.
+     * @param <Character> ASCII characters
+     * @param <Integer> character occurences
+     * @param unsortedmap the unsorted map
+     * @return sortedMap 
+     */
+    public static <Character, Integer extends Comparable< ? super Integer>>
+            Map<Character, Integer>
+    sortMap(final Map <Character, Integer> unsortedmap)
+    {
+        List<Map.Entry<Character, Integer>> sortedList =
+            new ArrayList<>(unsortedmap.size());  
+        Map<Character, Integer> sortedMap = new LinkedHashMap
+                <Character, Integer>();
+        sortedList.addAll(unsortedmap.entrySet());
+
+        Collections.sort(sortedList,
+                         new Comparator<Map.Entry<Character, Integer>>()
+        {
+            @Override
+            public int compare(
+                   final Map.Entry<Character, Integer> element1,
+                   final Map.Entry<Character, Integer> element2)
+            {
+                return element1.getValue().compareTo(element2.getValue());
+            }
+        }); 
+        //add sorted list to new map
+        for(Map.Entry<Character, Integer> entry : sortedList)
+        {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        } 
+        return sortedMap;
+    }  
 }
