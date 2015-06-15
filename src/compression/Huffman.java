@@ -174,23 +174,53 @@ public class Huffman
      */   
     public void decode(String inFileName)
     { 
-        FileInputStream fileInputStream=null;
+       FileInputStream fileInputStream=null;
  
-        File file = new File("src/compression/11.txt");
+        File file = new File(codFile);
  
         byte[] byteFile = Files.readAllBytes(file.toPath());
  
         try 
         {
             //Convert file into array of bytes
-	        fileInputStream = new FileInputStream(file);
-	        fileInputStream.read(byteFile);
-	        fileInputStream.close();
+	    fileInputStream = new FileInputStream(file);
+	    fileInputStream.read(byteFile);
+	    fileInputStream.close();
  
-	        for (int i = 0; i < byteFile.length; i++) 
+	    for (int i = 0; i < byteFile.length; i++) 
             {
-	       	    countChars(bFile[i]);
+	       	countChars(byteFile[i]);
             }
+            //implement huffmantree here
+            
+            HuffmanTree root;
+            HuffmanTree pos;
+            String result = "";
+            File file2 = new File(hufFile);
+            byte[] byteFile2 = Files.readAllBytes(file2.toPath());
+            for (int j= 0; j< byteFile2.length; j++)
+            {
+                if (pos instanceOf theTree)
+                {
+                    if(byteFile2[j] == '1')
+                    {
+                        pos = ((theTree)pos).left;
+                    }
+                    if(byteFile2[j] == '0')
+                    {
+                        pos = ((theTree)pos).right;
+                    }
+                }
+                if (pos instanceOf )
+                {
+                    result = result + (()pos).ch;
+                    pos = root;
+                }
+            }
+            return result;
+                
+            
+         
         }
         catch(Exception e)
         {
